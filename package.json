@@ -1,0 +1,37 @@
+{
+  "name": "glasskeys",
+  "version": "1.0.0",
+  "description": "Twitch Overlay Keypress Visualizer",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "keywords": [],
+  "author": "Dustin",
+  "license": "ISC",
+  "dependencies": {
+    "open": "^8.4.2",
+    "uiohook-napi": "^1.5.4",
+    "ws": "^8.19.0"
+  },
+  "devDependencies": {
+    "electron": "^28.2.0",
+    "electron-builder": "^24.9.1",
+    "electron-packager": "^17.1.2"
+  },
+  "build": {
+    "appId": "com.glasskeys.app",
+    "productName": "GlassKeys",
+    "win": {
+      "target": "portable"
+    },
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "**/*"
+    ]
+  }
+}

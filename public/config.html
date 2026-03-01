@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GlassKeys Config</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: #1e1e1e; /* Dark background */
+            color: #eee; /* Light text */
+            margin: 0;
+            padding: 15px;
+            height: 100vh;
+            box-sizing: border-box;
+            overflow: hidden; 
+            display: flex;
+            flex-direction: column;
+        }
+
+        h3 {
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0 0 10px 0;
+            color: #bbb; /* Lighter header */
+            border-bottom: 1px solid #333; /* Darker border */
+            padding-bottom: 5px;
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            flex: 1;
+            min-height: 0; 
+        }
+
+        .panel {
+            background: #252526; /* Dark panel */
+            padding: 12px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            border: 1px solid #333;
+        }
+
+        /* Compact Controls */
+        label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.85em;
+            font-weight: 500;
+            cursor: pointer;
+            color: #ddd;
+        }
+
+        select {
+            padding: 4px 8px;
+            border: 1px solid #444;
+            border-radius: 4px;
+            font-size: 0.85em;
+            width: 100%;
+            background-color: #333;
+            color: white;
+            cursor: pointer;
+        }
+
+        /* Range Slider */
+        .slider-container {
+            margin-top: 5px;
+        }
+        input[type="range"] {
+            width: 100%;
+            height: 4px;
+            margin: 10px 0;
+            cursor: pointer;
+            background: #444;
+        }
+
+        /* Binds Grid */
+        .binds-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px 12px;
+        }
+        
+        .bind-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #333; /* Darker item bg */
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            border: 1px solid #444;
+        }
+
+        button.rebind-btn {
+            background: #444;
+            border: 1px solid #555;
+            padding: 2px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: bold;
+            color: #eee;
+            min-width: 40px;
+            transition: all 0.1s;
+        }
+        button.rebind-btn:hover { border-color: #777; background: #555; }
+        button.rebind-btn.recording {
+            background: #d32f2f;
+            color: white;
+            border-color: #b71c1c;
+        }
+
+        /* Colors Grid */
+        .colors-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        
+        .color-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.8em;
+            color: #ccc;
+        }
+
+        input[type="color"] {
+            border: 1px solid #555;
+            width: 24px;
+            height: 24px;
+            padding: 0;
+            background: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        
+        /* Footer */
+        .footer {
+            margin-top: 15px;
+        }
+        .close-btn {
+            background: #0078d4; /* VS Code blueish */
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            font-size: 0.9em;
+            transition: background 0.2s;
+        }
+        .close-btn:hover { background: #106ebe; }
+
+        /* Specific Layout Tweaks */
+        .col-left { display: flex; flex-direction: column; gap: 15px; }
+        .col-right { display: flex; flex-direction: column; gap: 15px; }
+    </style>
+</head>
+<body>
+
+    <div class="main-layout">
+        <!-- Left Column: Layout & Binds -->
+        <div class="col-left">
+            <div class="panel">
+                <h3>Layout Options</h3>
+                <label>
+                    Hide Binds (+L/+R)
+                    <input type="checkbox" id="hide-binds">
+                </label>
+                <label>
+                    Hide Jump & Crouch
+                    <input type="checkbox" id="hide-jump-crouch">
+                </label>
+                <label>
+                    Use Arrows for +L/+R
+                    <input type="checkbox" id="arrows-mouse">
+                </label>
+            </div>
+
+            <div class="panel" style="flex: 1;">
+                <h3>Key Bindings</h3>
+                <div class="binds-grid">
+                    <div class="bind-item"><span>Forward</span> <button class="rebind-btn" data-action="W">W</button></div>
+                    <div class="bind-item"><span>Left</span> <button class="rebind-btn" data-action="A">A</button></div>
+                    <div class="bind-item"><span>Back</span> <button class="rebind-btn" data-action="S">S</button></div>
+                    <div class="bind-item"><span>Right</span> <button class="rebind-btn" data-action="D">D</button></div>
+                    <div class="bind-item"><span>Crouch</span> <button class="rebind-btn" data-action="TAB">TAB</button></div>
+                    <div class="bind-item"><span>Jump</span> <button class="rebind-btn" data-action="SPACE">SPC</button></div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h3>OBS Setup</h3>
+                <div style="font-size: 0.85em; color: #ccc; line-height: 1.4;">
+                    <div style="margin-bottom: 8px;">Add a <strong>Browser</strong> source:</div>
+                    <div style="background: #111; padding: 6px; border: 1px solid #333; border-radius: 4px; font-family: 'Roboto Mono', monospace; margin-bottom: 8px; user-select: all; cursor: text; color: #4caf50;">http://localhost:3001</div>
+                    <div style="display: flex; justify-content: space-between; background: #333; padding: 4px 8px; border-radius: 4px;">
+                        <span>W: <strong style="color: #fff">765</strong></span>
+                        <span style="color: #555">|</span>
+                        <span>H: <strong style="color: #fff">375</strong></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Style & Theme -->
+        <div class="col-right">
+            <div class="panel" style="flex: 1;">
+                <h3>Style & Theme</h3>
+                
+                <div style="margin-bottom: 10px;">
+                    <label style="margin-bottom: 4px;">Preset Theme</label>
+                    <select id="theme-preset">
+                        <option value="custom">Custom</option>
+                        <option value="glass">Glass (Default)</option>
+                        <option value="dark">Minimal Dark</option>
+                        <option value="cyber">Cyberpunk</option>
+                        <option value="retro">Retro Terminal</option>
+                        <option value="clean">Clean White</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 10px;">
+                    <label style="margin-bottom: 4px;">Font Family</label>
+                    <select id="font-family">
+                        <option value="'Inter', sans-serif">Inter</option>
+                        <option value="'Roboto Mono', monospace">Roboto Mono</option>
+                        <option value="'Montserrat', sans-serif">Montserrat</option>
+                        <option value="'Courier New', monospace">Courier New</option>
+                        <option value="Arial, sans-serif">Arial</option>
+                    </select>
+                </div>
+
+                <div class="slider-container" style="margin-bottom: 10px;">
+                    <label style="margin-bottom: 4px;">Overlay Opacity <span id="opacity-val" style="color:#2196f3">100%</span></label>
+                    <input type="range" id="opacity" min="0" max="100" value="100" style="margin: 5px 0;">
+                </div>
+
+                <div style="margin-bottom: 10px;">
+                    <label style="margin-bottom: 4px;">Theme Colors</label>
+                        <div class="colors-grid">
+                        <div class="color-item">Idle BG <input type="color" id="bg-idle" value="#000000"></div>
+                        <div class="color-item">Active BG <input type="color" id="bg-active" value="#ffffff"></div>
+                        <div class="color-item">Idle Border <input type="color" id="border-idle" value="#ffffff"></div>
+                        <div class="color-item">Active Border <input type="color" id="border-active" value="#ffffff"></div>
+                        <div class="color-item">Idle Text <input type="color" id="text-idle" value="#ffffff"></div>
+                        <div class="color-item">Active Text <input type="color" id="text-active" value="#000000"></div>
+                        <div class="color-item" style="grid-column: span 2;">Active Glow <input type="color" id="glow-active" value="#ffffff"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+
+        // Request Config
+        ipcRenderer.send('get-current-config');
+
+        // Elements
+        const opacity = document.getElementById('opacity');
+        const opacityVal = document.getElementById('opacity-val');
+        const hideBinds = document.getElementById('hide-binds');
+        const hideJumpCrouch = document.getElementById('hide-jump-crouch');
+        const arrowsMouse = document.getElementById('arrows-mouse');
+        const themePreset = document.getElementById('theme-preset');
+        const fontFamily = document.getElementById('font-family');
+
+        const colors = {
+            bgIdle: document.getElementById('bg-idle'),
+            borderIdle: document.getElementById('border-idle'),
+            textIdle: document.getElementById('text-idle'),
+            bgActive: document.getElementById('bg-active'),
+            borderActive: document.getElementById('border-active'),
+            textActive: document.getElementById('text-active'),
+            glowActive: document.getElementById('glow-active')
+        };
+
+        const PRESETS = {
+            glass: {
+                bgIdle: "rgba(0, 0, 0, 0.15)",
+                borderIdle: "rgba(255, 255, 255, 0.6)",
+                textIdle: "rgba(255, 255, 255, 0.6)",
+                bgActive: "rgba(255, 255, 255, 0.8)",
+                borderActive: "rgba(255, 255, 255, 1)",
+                textActive: "#000000",
+                glowActive: "rgba(255, 255, 255, 0.5)",
+                fontFamily: "'Inter', sans-serif"
+            },
+            dark: {
+                bgIdle: "#1a1a1a",
+                borderIdle: "#333333",
+                textIdle: "#888888",
+                bgActive: "#ffffff",
+                borderActive: "#ffffff",
+                textActive: "#000000",
+                glowActive: "rgba(255, 255, 255, 0.2)",
+                fontFamily: "'Roboto Mono', monospace"
+            },
+            cyber: {
+                bgIdle: "rgba(0, 0, 20, 0.8)",
+                borderIdle: "#00ffea",
+                textIdle: "#00ffea",
+                bgActive: "#00ffea",
+                borderActive: "#ff00ff",
+                textActive: "#000000",
+                glowActive: "#00ffea",
+                fontFamily: "'Courier New', monospace"
+            },
+            retro: {
+                bgIdle: "#000000",
+                borderIdle: "#00ff00",
+                textIdle: "#00ff00",
+                bgActive: "#00ff00",
+                borderActive: "#00ff00",
+                textActive: "#000000",
+                glowActive: "#00ff00",
+                fontFamily: "'Courier New', monospace"
+            },
+            clean: {
+                bgIdle: "#ffffff",
+                borderIdle: "#e0e0e0",
+                textIdle: "#333333",
+                bgActive: "#333333",
+                borderActive: "#000000",
+                textActive: "#ffffff",
+                glowActive: "rgba(0,0,0,0.1)",
+                fontFamily: "Arial, sans-serif"
+            }
+        };
+
+        function colorToHex(color) {
+            if (!color) return '#000000';
+            if (color.startsWith('#')) return color.substring(0, 7); 
+            if (color.startsWith('rgb')) {
+                const match = color.match(/(\d+(\.\d+)?)/g);
+                if (match && match.length >= 3) {
+                    const r = parseInt(match[0]);
+                    const g = parseInt(match[1]);
+                    const b = parseInt(match[2]);
+                    const toHex = c => { const h = c.toString(16); return h.length===1?'0'+h:h; };
+                    return "#" + toHex(r) + toHex(g) + toHex(b);
+                }
+            }
+            return '#000000'; 
+        }
+
+        function sendThemeUpdate() {
+            const theme = {
+                fontFamily: fontFamily.value,
+                bgIdle: colors.bgIdle.value, 
+                borderIdle: colors.borderIdle.value,
+                textIdle: colors.textIdle.value,
+                bgActive: colors.bgActive.value,
+                borderActive: colors.borderActive.value,
+                textActive: colors.textActive.value,
+                glowActive: colors.glowActive.value
+            };
+            ipcRenderer.send('set-theme', theme);
+            themePreset.value = 'custom'; 
+        }
+
+        // Event Listeners
+        Object.values(colors).forEach(input => input.addEventListener('input', sendThemeUpdate));
+        fontFamily.addEventListener('change', sendThemeUpdate);
+
+        themePreset.addEventListener('change', (e) => {
+            const preset = PRESETS[e.target.value];
+            if (preset) {
+                ipcRenderer.send('set-theme', preset);
+                fontFamily.value = preset.fontFamily;
+                colors.bgIdle.value = colorToHex(preset.bgIdle);
+                colors.borderIdle.value = colorToHex(preset.borderIdle);
+                colors.textIdle.value = colorToHex(preset.textIdle);
+                colors.bgActive.value = colorToHex(preset.bgActive);
+                colors.borderActive.value = colorToHex(preset.borderActive);
+                colors.textActive.value = colorToHex(preset.textActive);
+                colors.glowActive.value = colorToHex(preset.glowActive);
+            }
+        });
+
+        opacity.addEventListener('input', (e) => {
+            opacityVal.innerText = e.target.value + '%';
+            ipcRenderer.send('set-opacity', e.target.value);
+        });
+
+        hideBinds.addEventListener('change', (e) => ipcRenderer.send('set-hide-binds', e.target.checked));
+        hideJumpCrouch.addEventListener('change', (e) => ipcRenderer.send('set-hide-jump-crouch', e.target.checked));
+        arrowsMouse.addEventListener('change', (e) => ipcRenderer.send('set-arrows-mouse', e.target.checked));
+
+        // Rebinding
+        const rebindBtns = document.querySelectorAll('.rebind-btn');
+        let currentRebindBtn = null;
+
+        rebindBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                btn.blur();
+                if (currentRebindBtn) {
+                    currentRebindBtn.classList.remove('recording');
+                    currentRebindBtn.innerText = currentRebindBtn.dataset.key || currentRebindBtn.dataset.action; 
+                }
+
+                currentRebindBtn = btn;
+                btn.classList.add('recording');
+                btn.innerText = '...';
+                
+                ipcRenderer.send('start-recording', btn.dataset.action);
+            });
+        });
+
+        // Updates
+        ipcRenderer.on('current-config', (event, config) => {
+            opacity.value = config.opacity;
+            opacityVal.innerText = config.opacity + '%';
+            hideBinds.checked = config.hideBinds;
+            hideJumpCrouch.checked = config.hideJumpCrouch;
+            arrowsMouse.checked = config.arrowsForMouse;
+            
+            if (config.theme) {
+                fontFamily.value = config.theme.fontFamily;
+                colors.bgIdle.value = colorToHex(config.theme.bgIdle);
+                colors.borderIdle.value = colorToHex(config.theme.borderIdle);
+                colors.textIdle.value = colorToHex(config.theme.textIdle);
+                colors.bgActive.value = colorToHex(config.theme.bgActive);
+                colors.borderActive.value = colorToHex(config.theme.borderActive);
+                colors.textActive.value = colorToHex(config.theme.textActive);
+                colors.glowActive.value = colorToHex(config.theme.glowActive);
+            }
+        });
+
+        ipcRenderer.on('binding-recorded', (event, data) => {
+            if (currentRebindBtn && currentRebindBtn.dataset.action === data.action) {
+                // Map common keys to shorter names for UI if needed
+                let display = data.keyName;
+                if(display === 'Space') display = 'SPC';
+                
+                currentRebindBtn.innerText = display; 
+                currentRebindBtn.dataset.key = display; 
+                currentRebindBtn.classList.remove('recording');
+                currentRebindBtn = null;
+            }
+        });
+    </script>
+</body>
+</html>

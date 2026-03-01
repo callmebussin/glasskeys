@@ -1,0 +1,77 @@
+body {
+    background-color: transparent; /* Essential for OBS Overlay */
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-family);
+    color: white;
+    overflow: hidden; /* Prevent scrollbars */
+    width: fit-content;
+    height: fit-content;
+}
+
+body.desktop-mode {
+    background-color: #1e1e1e; /* Dark background for desktop app */
+}
+
+/* Variables Default */
+:root {
+    --font-family: 'Inter', sans-serif;
+    --bg-idle: rgba(0, 0, 0, 0.15);
+    --border-idle: rgba(255, 255, 255, 0.6);
+    --text-idle: rgba(255, 255, 255, 0.6);
+    --bg-active: rgba(255, 255, 255, 0.8);
+    --border-active: rgba(255, 255, 255, 1);
+    --text-active: #000000;
+    --glow-active: rgba(255, 255, 255, 0.5);
+}
+
+.overlay-container {
+    display: grid;
+    grid-template-rows: repeat(2, auto);
+    gap: 15px; /* Vertical spacing */
+    background: rgba(0, 0, 0, 0.0); /* Transparent container */
+}
+
+.key-row {
+    display: flex;
+    gap: 15px; /* Horizontal spacing */
+    justify-content: center;
+}
+
+.key {
+    width: 180px;
+    height: 180px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 6px solid var(--border-idle);
+    border-radius: 24px; /* Rounded rectangle */
+    background-color: var(--bg-idle);
+    color: var(--text-idle);
+    font-size: 54px;
+    font-weight: bold;
+    opacity: 0.6; /* Idle opacity */
+    transition: all 0.1s ease; /* Quick transition for responsiveness */
+    box-sizing: border-box;
+}
+
+/* Specific styling for Space if needed, but keeping it uniform for grid */
+.key.wide {
+    width: 180px; /* Keeping uniform to match grid of 4x2 */
+    font-size: 32px; /* Smaller text for 'JUMP' / 'CROUCH' */
+}
+
+/* Active State */
+.key.active {
+    background-color: var(--bg-active);
+    color: var(--text-active);
+    opacity: 1;
+    border-color: var(--border-active);
+    box-shadow: 0 0 30px var(--glow-active);
+    transform: scale(0.95); /* Subtle press effect */
+}
+
+/* Remove ID specific overrides that caused conflicts */
+#key-TAB {
+    font-size: 32px; /* CROUCH needs smaller text */
+}
