@@ -1,6 +1,6 @@
 # GlassKeys - Twitch Overlay Keypress Visualizer
 
-![GlassKeys Demo](demo.gif)
+![GlassKeys Demo](public/demo.gif)
 
 A minimal, transparent overlay for Twitch streams that displays live keypress inputs for W, A, S, D, TAB, SPACE, and Mouse Buttons.
 
