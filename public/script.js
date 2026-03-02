@@ -120,6 +120,7 @@ function applyConfig(config) {
 
     if (ipcRenderer) {
         let width = 765;
+        let height = 375;
         
         if (config.compactMode) {
             width = 570;
@@ -128,7 +129,15 @@ function applyConfig(config) {
             if (config.hideBinds && config.hideJumpCrouch) width = 570;
         }
         
-        ipcRenderer.send('resize-window', { width: width, height: 375 });
+        // Apply Scale
+        const scale = config.windowScale || 1.0;
+        document.body.style.zoom = scale;
+        
+        // Resize window to match scaled content
+        ipcRenderer.send('resize-window', { 
+            width: Math.ceil(width * scale), 
+            height: Math.ceil(height * scale) 
+        });
     }
 }
 

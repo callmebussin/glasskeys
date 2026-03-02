@@ -187,6 +187,26 @@
                 </label>
             </div>
 
+            <div class="panel">
+                 <h3>Window Settings</h3>
+                 <label>
+                    Always on Top
+                    <input type="checkbox" id="always-on-top">
+                </label>
+                <div class="slider-container">
+                    <label style="margin-bottom: 4px;">Window Scale <span id="scale-val" style="color:#2196f3">1.0x</span></label>
+                    <input type="range" id="window-scale" min="0.5" max="2.0" step="0.1" value="1.0" style="margin: 5px 0;">
+                </div>
+                <div style="margin-top: 10px;">
+                    <label style="margin-bottom: 4px;">Server Port</label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="number" id="server-port" value="3001" style="width: 60px; padding: 4px; background: #333; border: 1px solid #444; color: white; border-radius: 4px;">
+                        <button id="set-port-btn" class="rebind-btn" style="width: auto;">Set</button>
+                    </div>
+                    <div style="font-size: 0.75em; color: #888; margin-top: 4px;">Changing port restarts internal server. Update OBS URL accordingly.</div>
+                </div>
+            </div>
+
             <div class="panel" style="flex: 1;">
                 <h3>Key Bindings</h3>
                 <div class="binds-grid">
@@ -272,6 +292,11 @@
         const hideBinds = document.getElementById('hide-binds');
         const hideJumpCrouch = document.getElementById('hide-jump-crouch');
         const arrowsMouse = document.getElementById('arrows-mouse');
+        const alwaysOnTop = document.getElementById('always-on-top');
+        const windowScale = document.getElementById('window-scale');
+        const scaleVal = document.getElementById('scale-val');
+        const serverPort = document.getElementById('server-port');
+        const setPortBtn = document.getElementById('set-port-btn');
         const themePreset = document.getElementById('theme-preset');
         const fontFamily = document.getElementById('font-family');
 
@@ -396,6 +421,16 @@
         hideBinds.addEventListener('change', (e) => ipcRenderer.send('set-hide-binds', e.target.checked));
         hideJumpCrouch.addEventListener('change', (e) => ipcRenderer.send('set-hide-jump-crouch', e.target.checked));
         arrowsMouse.addEventListener('change', (e) => ipcRenderer.send('set-arrows-mouse', e.target.checked));
+        alwaysOnTop.addEventListener('change', (e) => ipcRenderer.send('set-always-on-top', e.target.checked));
+        
+        windowScale.addEventListener('input', (e) => {
+            scaleVal.innerText = e.target.value + 'x';
+            ipcRenderer.send('set-window-scale', e.target.value);
+        });
+
+        setPortBtn.addEventListener('click', () => {
+            ipcRenderer.send('set-port', serverPort.value);
+        });
 
         // Rebinding
         const rebindBtns = document.querySelectorAll('.rebind-btn');
@@ -424,6 +459,16 @@
             hideBinds.checked = config.hideBinds;
             hideJumpCrouch.checked = config.hideJumpCrouch;
             arrowsMouse.checked = config.arrowsForMouse;
+            alwaysOnTop.checked = config.alwaysOnTop || false;
+            
+            if (config.windowScale) {
+                windowScale.value = config.windowScale;
+                scaleVal.innerText = config.windowScale + 'x';
+            }
+
+            if (config.port) {
+                serverPort.value = config.port;
+            }
             
             if (config.theme) {
                 fontFamily.value = config.theme.fontFamily;

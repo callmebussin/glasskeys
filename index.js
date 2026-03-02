@@ -5,7 +5,7 @@ const http = require('http');
 const path = require('path');
 const { ipcMain } = require('electron');
 
-const HTTP_PORT = 3001;
+// const HTTP_PORT = 3001; // Deprecated, using appConfig.port
 const WS_PORT = 8081;
 
 const keyState = {
@@ -25,6 +25,9 @@ let appConfig = {
     hideJumpCrouch: false,
     arrowsForMouse: false,
     compactMode: false,
+    alwaysOnTop: false,
+    windowScale: 1.0,
+    port: 3001,
     
     theme: {
         fontFamily: "'Inter', sans-serif",
@@ -181,6 +184,39 @@ ipcMain.on('set-theme', (event, theme) => {
     broadcastConfig();
 });
 
+ipcMain.on('set-always-on-top', (event, value) => {
+    appConfig.alwaysOnTop = value;
+    broadcastConfig();
+    // Forward to main process window handler
+    const { BrowserWindow } = require('electron');
+    const wins = BrowserWindow.getAllWindows();
+    // Assuming the first non-config window is the main one, or loop all
+    wins.forEach(w => {
+        if (w.getTitle() === "GlassKeys Preview") {
+            w.setAlwaysOnTop(value, 'screen-saver');
+        }
+    });
+});
+
+ipcMain.on('set-window-scale', (event, value) => {
+    appConfig.windowScale = parseFloat(value);
+    broadcastConfig();
+});
+
+ipcMain.on('set-port', (event, value) => {
+    const newPort = parseInt(value);
+    if (newPort !== appConfig.port) {
+        appConfig.port = newPort;
+        // Restart HTTP Server
+        server.close(() => {
+            server.listen(appConfig.port, () => {
+                console.log(`Server restarted on port ${appConfig.port}`);
+            });
+        });
+        broadcastConfig();
+    }
+});
+
 function checkCompactMode() {
     if (appConfig.hideBinds && !appConfig.hideJumpCrouch) {
         appConfig.compactMode = true;
@@ -231,7 +267,7 @@ const server = http.createServer((req, res) => {
     });
 });
 
-server.listen(HTTP_PORT, () => {
+server.listen(appConfig.port, () => {
 });
 
 module.exports = { appConfig };
