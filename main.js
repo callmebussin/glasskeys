@@ -1,8 +1,7 @@
 const { app, BrowserWindow, Tray, Menu, nativeImage, ipcMain } = require('electron');
 const path = require('path');
 
-// Start the backend server and uIOhook
-require('./index.js'); // Assuming index.js handles all setup side-effects
+require('./index.js');
 
 let mainWindow;
 let configWindow;
@@ -33,10 +32,8 @@ function createMainWindow() {
     icon: path.join(__dirname, 'public', 'icon.png')
   });
 
-  // Load with mode=desktop to distinguish from OBS Browser Source
   mainWindow.loadURL('http://localhost:3001/?mode=desktop');
 
-  // Prevent app from quitting when closing window, minimize to tray instead
   mainWindow.on('close', (event) => {
     if (!isQuitting) {
       event.preventDefault();
@@ -58,8 +55,8 @@ function createConfigWindow() {
   }
 
   configWindow = new BrowserWindow({
-    width: 800, // Landscape width
-    height: 600, // Landscape height
+    width: 800,
+    height: 600,
     minWidth: 600,
     minHeight: 600,
     maxWidth: 800,
@@ -117,10 +114,8 @@ function createTray() {
   });
 }
 
-// Window Resize Handler
 ipcMain.on('resize-window', (event, { width, height }) => {
     if (mainWindow) {
-        // useContentSize was set to true on creation, so setContentSize sets the viewport area
         mainWindow.setContentSize(width, height);
     }
 });
@@ -138,8 +133,6 @@ app.whenReady().then(() => {
 });
 
 app.on('window-all-closed', () => {
-  // Do nothing, keep running in tray unless explicit quit
   if (process.platform === 'darwin') {
-      // Mac behavior usually quits if no windows, but for tray apps we might keep running
   }
 });

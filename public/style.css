@@ -1,19 +1,18 @@
 body {
-    background-color: transparent; /* Essential for OBS Overlay */
+    background-color: transparent; 
     margin: 0;
     padding: 0;
     font-family: var(--font-family);
     color: white;
-    overflow: hidden; /* Prevent scrollbars */
+    overflow: hidden; 
     width: fit-content;
     height: fit-content;
 }
 
 body.desktop-mode {
-    background-color: #1e1e1e; /* Dark background for desktop app */
+    background-color: #1e1e1e; 
 }
 
-/* Variables Default */
 :root {
     --font-family: 'Inter', sans-serif;
     --bg-idle: rgba(0, 0, 0, 0.15);
@@ -28,13 +27,13 @@ body.desktop-mode {
 .overlay-container {
     display: grid;
     grid-template-rows: repeat(2, auto);
-    gap: 15px; /* Vertical spacing */
-    background: rgba(0, 0, 0, 0.0); /* Transparent container */
+    gap: 15px; 
+    background: rgba(0, 0, 0, 0.0); 
 }
 
 .key-row {
     display: flex;
-    gap: 15px; /* Horizontal spacing */
+    gap: 15px; 
     justify-content: center;
 }
 
@@ -45,33 +44,30 @@ body.desktop-mode {
     justify-content: center;
     align-items: center;
     border: 6px solid var(--border-idle);
-    border-radius: 24px; /* Rounded rectangle */
+    border-radius: 24px; 
     background-color: var(--bg-idle);
     color: var(--text-idle);
     font-size: 54px;
     font-weight: bold;
-    opacity: 0.6; /* Idle opacity */
-    transition: all 0.1s ease; /* Quick transition for responsiveness */
+    opacity: 0.6; 
+    transition: all 0.1s ease; 
     box-sizing: border-box;
 }
 
-/* Specific styling for Space if needed, but keeping it uniform for grid */
 .key.wide {
-    width: 180px; /* Keeping uniform to match grid of 4x2 */
-    font-size: 32px; /* Smaller text for 'JUMP' / 'CROUCH' */
+    width: 180px; 
+    font-size: 32px; 
 }
 
-/* Active State */
 .key.active {
     background-color: var(--bg-active);
     color: var(--text-active);
     opacity: 1;
     border-color: var(--border-active);
     box-shadow: 0 0 30px var(--glow-active);
-    transform: scale(0.95); /* Subtle press effect */
+    transform: scale(0.95); 
 }
 
-/* Remove ID specific overrides that caused conflicts */
 #key-TAB {
-    font-size: 32px; /* CROUCH needs smaller text */
+    font-size: 32px; 
 }

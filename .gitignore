@@ -3,3 +3,4 @@ dist
 glasskeys-win32-x64
 .DS_Store
 Thumbs.db
+*.zip
