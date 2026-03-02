@@ -1,6 +1,6 @@
 {
   "name": "glasskeys",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Twitch Overlay Keypress Visualizer",
   "main": "main.js",
   "scripts": {
