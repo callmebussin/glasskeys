@@ -8,11 +8,9 @@ body {
     width: fit-content;
     height: fit-content;
 }
-
 body.desktop-mode {
     background-color: #1e1e1e; 
 }
-
 :root {
     --font-family: 'Inter', sans-serif;
     --bg-idle: rgba(0, 0, 0, 0.15);
@@ -23,20 +21,17 @@ body.desktop-mode {
     --text-active: #000000;
     --glow-active: rgba(255, 255, 255, 0.5);
 }
-
 .overlay-container {
     display: grid;
     grid-template-rows: repeat(2, auto);
     gap: 15px; 
     background: rgba(0, 0, 0, 0.0); 
 }
-
 .key-row {
     display: flex;
     gap: 15px; 
     justify-content: center;
 }
-
 .key {
     width: 180px;
     height: 180px;
@@ -53,12 +48,10 @@ body.desktop-mode {
     transition: all 0.1s ease; 
     box-sizing: border-box;
 }
-
 .key.wide {
     width: 180px; 
     font-size: 32px; 
 }
-
 .key.active {
     background-color: var(--bg-active);
     color: var(--text-active);
@@ -67,7 +60,6 @@ body.desktop-mode {
     box-shadow: 0 0 30px var(--glow-active);
     transform: scale(0.95); 
 }
-
 #key-TAB {
     font-size: 32px; 
 }
