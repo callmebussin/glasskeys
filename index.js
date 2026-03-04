@@ -22,6 +22,7 @@ let appConfig = {
     arrowsForMouse: false,
     compactMode: false,
     alwaysOnTop: false,
+    flipTurnBinds: false,
     windowScale: 1.0,
     port: 3001,
     theme: {
@@ -42,6 +43,10 @@ let keyMap = {
     [UiohookKey.D]: 'D',
     [UiohookKey.Space]: 'SPACE',
     [UiohookKey.Tab]: 'TAB'
+};
+let mouseMap = {
+    1: 'MOUSE1',
+    2: 'MOUSE2'
 };
 const ReverseKeyMap = {};
 for (const [key, value] of Object.entries(UiohookKey)) {
@@ -77,10 +82,15 @@ uIOhook.on('keydown', (e) => {
                 delete keyMap[code];
             }
         }
+        for (const [btn, action] of Object.entries(mouseMap)) {
+            if (action === recordingAction) {
+                delete mouseMap[btn];
+            }
+        }
         keyMap[e.keycode] = recordingAction;
         let keyName = ReverseKeyMap[e.keycode] || e.keycode;
         BrowserWindow.getAllWindows().forEach(win => {
-            win.webContents.send('binding-recorded', { action: recordingAction, keycode: e.keycode, keyName: keyName });
+            win.webContents.send('binding-recorded', { action: recordingAction, keycode: e.keycode, keyName: keyName, type: 'keyboard' });
         });
         isRecording = false;
         recordingAction = null;
@@ -101,32 +111,37 @@ uIOhook.on('keyup', (e) => {
     }
 });
 uIOhook.on('mousedown', (e) => {
-    if (isRecording) {
+    if (isRecording && recordingAction) {
+        for (const [code, action] of Object.entries(keyMap)) {
+            if (action === recordingAction) {
+                delete keyMap[code];
+            }
+        }
+        for (const [btn, action] of Object.entries(mouseMap)) {
+            if (action === recordingAction) {
+                delete mouseMap[btn];
+            }
+        }
+        mouseMap[e.button] = recordingAction;
+        BrowserWindow.getAllWindows().forEach(win => {
+            win.webContents.send('binding-recorded', { action: recordingAction, button: e.button, keyName: 'Mouse ' + e.button, type: 'mouse' });
+        });
+        isRecording = false;
+        recordingAction = null;
         return;
     }
-    if (e.button === 1) {
-        if (!keyState.MOUSE1) {
-            keyState.MOUSE1 = true;
-            broadcastState();
-        }
-    } else if (e.button === 2) {
-        if (!keyState.MOUSE2) {
-            keyState.MOUSE2 = true;
-            broadcastState();
-        }
+    const action = mouseMap[e.button];
+    if (action && !keyState[action]) {
+        keyState[action] = true;
+        broadcastState();
     }
 });
 uIOhook.on('mouseup', (e) => {
-    if (e.button === 1) {
-        if (keyState.MOUSE1) {
-            keyState.MOUSE1 = false;
-            broadcastState();
-        }
-    } else if (e.button === 2) {
-        if (keyState.MOUSE2) {
-            keyState.MOUSE2 = false;
-            broadcastState();
-        }
+    if (isRecording) return;
+    const action = mouseMap[e.button];
+    if (action && keyState[action]) {
+        keyState[action] = false;
+        broadcastState();
     }
 });
 uIOhook.start();
@@ -154,6 +169,10 @@ ipcMain.on('set-theme', (event, theme) => {
 });
 ipcMain.on('set-always-on-top', (event, value) => {
     appConfig.alwaysOnTop = value;
+    broadcastConfig();
+});
+ipcMain.on('set-flip-turn-binds', (event, value) => {
+    appConfig.flipTurnBinds = value;
     broadcastConfig();
 });
 ipcMain.on('set-window-scale', (event, value) => {

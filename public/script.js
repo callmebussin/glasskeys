@@ -19,7 +19,8 @@ let currentConfig = {
     hideBinds: false,
     hideJumpCrouch: false,
     arrowsForMouse: false,
-    compactMode: false
+    compactMode: false,
+    flipTurnBinds: false
 };
 const activeClass = 'active';
 socket.addEventListener('open', () => {
@@ -114,6 +115,12 @@ function applyConfig(config) {
     }
 }
 function updateOverlay(state) {
+    let m1State = state.MOUSE1;
+    let m2State = state.MOUSE2;
+    if (currentConfig.flipTurnBinds) {
+        m1State = state.MOUSE2;
+        m2State = state.MOUSE1;
+    }
     if (currentConfig.compactMode) {
         toggle(ui.W, state.W);
         toggle(ui.A, state.A);
@@ -128,8 +135,8 @@ function updateOverlay(state) {
         toggle(ui.D, state.D);
         toggle(ui.TAB, state.TAB);
         toggle(ui.SPACE, state.SPACE);
-        toggle(ui.MOUSE1, state.MOUSE1); 
-        toggle(ui.MOUSE2, state.MOUSE2); 
+        toggle(ui.MOUSE1, m1State); 
+        toggle(ui.MOUSE2, m2State); 
     }
 }
 function toggle(el, active) {

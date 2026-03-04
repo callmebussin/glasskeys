@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GlassKeys Config</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Montserrat:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Segoe UI', system-ui, sans-serif;
@@ -176,6 +179,10 @@
                     Use Arrows for +L/+R
                     <input type="checkbox" id="arrows-mouse">
                 </label>
+                <label>
+                    Flip Turn Binds (+L/+R)
+                    <input type="checkbox" id="flip-turn-binds">
+                </label>
             </div>
             <div class="panel">
                  <h3>Window Settings</h3>
@@ -187,14 +194,6 @@
                     <label style="margin-bottom: 4px;">Window Scale <span id="scale-val" style="color:#2196f3">1.0x</span></label>
                     <input type="range" id="window-scale" min="0.5" max="2.0" step="0.1" value="1.0" style="margin: 5px 0;">
                 </div>
-                <div style="margin-top: 10px;">
-                    <label style="margin-bottom: 4px;">Server Port</label>
-                    <div style="display: flex; gap: 8px;">
-                        <input type="number" id="server-port" value="3001" style="width: 60px; padding: 4px; background: #333; border: 1px solid #444; color: white; border-radius: 4px;">
-                        <button id="set-port-btn" class="port-btn">Set</button>
-                    </div>
-                    <div style="font-size: 0.75em; color: #888; margin-top: 4px;">Changing port restarts internal server. Update OBS URL accordingly.</div>
-                </div>
             </div>
             <div class="panel" style="flex: 1;">
                 <h3>Key Bindings</h3>
@@ -205,6 +204,8 @@
                     <div class="bind-item"><span>Right</span> <button class="rebind-btn" data-action="D">D</button></div>
                     <div class="bind-item"><span>Crouch</span> <button class="rebind-btn" data-action="TAB">TAB</button></div>
                     <div class="bind-item"><span>Jump</span> <button class="rebind-btn" data-action="SPACE">SPC</button></div>
+                    <div class="bind-item"><span>Turn Left (+L)</span> <button class="rebind-btn" data-action="MOUSE1">M1</button></div>
+                    <div class="bind-item"><span>Turn Right (+R)</span> <button class="rebind-btn" data-action="MOUSE2">M2</button></div>
                 </div>
             </div>
         </div>
@@ -249,18 +250,22 @@
             </div>
         </div>
     </div>
-    <div class="panel">
-        <h3>OBS Setup</h3>
-        <div style="font-size: 0.85em; color: #ccc; line-height: 1.4;">
-            <div style="margin-bottom: 8px;">Add a <strong>Browser</strong> source:</div>
-            <div style="background: #111; padding: 6px; border: 1px solid #333; border-radius: 4px; font-family: 'Roboto Mono', monospace; margin-bottom: 8px; user-select: all; cursor: text; color: #4caf50;">http://localhost:3001</div>
-            <div style="display: flex; justify-content: space-between; background: #333; padding: 4px 8px; border-radius: 4px;">
-                <span>W: <strong style="color: #fff">765</strong></span>
-                <span style="color: #555">|</span>
-                <span>H: <strong style="color: #fff">375</strong></span>
+            <div class="panel">
+                <h3>OBS Setup</h3>
+                <div style="font-size: 0.85em; color: #ccc; line-height: 1.4;">
+                    <div style="margin-bottom: 10px;">
+                        <label style="margin-bottom: 4px;">Server Port</label>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="number" id="server-port" value="3001" style="width: 60px; padding: 4px; background: #333; border: 1px solid #444; color: white; border-radius: 4px;">
+                            <button id="set-port-btn" class="port-btn">Set</button>
+                        </div>
+                        <div style="font-size: 0.9em; color: #888; margin-top: 4px;">Changing port restarts server.</div>
+                    </div>
+                    
+                    <div style="margin-bottom: 8px;">Add a <strong>Browser</strong> source:</div>
+                    <div id="obs-url-display" style="background: #111; padding: 6px; border: 1px solid #333; border-radius: 4px; font-family: 'Roboto Mono', monospace; margin-bottom: 8px; user-select: all; cursor: text; color: #4caf50;">http://localhost:3001</div>
+                </div>
             </div>
-        </div>
-    </div>
     <script>
         const { ipcRenderer } = require('electron');
         ipcRenderer.send('get-current-config');
@@ -269,11 +274,13 @@
         const hideBinds = document.getElementById('hide-binds');
         const hideJumpCrouch = document.getElementById('hide-jump-crouch');
         const arrowsMouse = document.getElementById('arrows-mouse');
+        const flipTurnBinds = document.getElementById('flip-turn-binds');
         const alwaysOnTop = document.getElementById('always-on-top');
         const windowScale = document.getElementById('window-scale');
         const scaleVal = document.getElementById('scale-val');
         const serverPort = document.getElementById('server-port');
         const setPortBtn = document.getElementById('set-port-btn');
+        const obsUrlDisplay = document.getElementById('obs-url-display');
         const themePreset = document.getElementById('theme-preset');
         const fontFamily = document.getElementById('font-family');
         const colors = {
@@ -337,6 +344,8 @@
                 fontFamily: "Arial, sans-serif"
             }
         };
+        let customThemeCache = {};
+
         function colorToHex(color) {
             if (!color) return '#000000';
             if (color.startsWith('#')) return color.substring(0, 7); 
@@ -363,23 +372,40 @@
                 textActive: colors.textActive.value,
                 glowActive: colors.glowActive.value
             };
+            
+            // Save manual changes to custom cache
+            customThemeCache = { ...theme };
+            
             ipcRenderer.send('set-theme', theme);
             themePreset.value = 'custom'; 
         }
+
+        function applyThemeToUI(theme) {
+            fontFamily.value = theme.fontFamily;
+            colors.bgIdle.value = colorToHex(theme.bgIdle);
+            colors.borderIdle.value = colorToHex(theme.borderIdle);
+            colors.textIdle.value = colorToHex(theme.textIdle);
+            colors.bgActive.value = colorToHex(theme.bgActive);
+            colors.borderActive.value = colorToHex(theme.borderActive);
+            colors.textActive.value = colorToHex(theme.textActive);
+            colors.glowActive.value = colorToHex(theme.glowActive);
+        }
+
         Object.values(colors).forEach(input => input.addEventListener('input', sendThemeUpdate));
         fontFamily.addEventListener('change', sendThemeUpdate);
+
         themePreset.addEventListener('change', (e) => {
-            const preset = PRESETS[e.target.value];
-            if (preset) {
-                ipcRenderer.send('set-theme', preset);
-                fontFamily.value = preset.fontFamily;
-                colors.bgIdle.value = colorToHex(preset.bgIdle);
-                colors.borderIdle.value = colorToHex(preset.borderIdle);
-                colors.textIdle.value = colorToHex(preset.textIdle);
-                colors.bgActive.value = colorToHex(preset.bgActive);
-                colors.borderActive.value = colorToHex(preset.borderActive);
-                colors.textActive.value = colorToHex(preset.textActive);
-                colors.glowActive.value = colorToHex(preset.glowActive);
+            if (e.target.value === 'custom') {
+                if (Object.keys(customThemeCache).length > 0) {
+                    applyThemeToUI(customThemeCache);
+                    ipcRenderer.send('set-theme', customThemeCache);
+                }
+            } else {
+                const preset = PRESETS[e.target.value];
+                if (preset) {
+                    applyThemeToUI(preset);
+                    ipcRenderer.send('set-theme', preset);
+                }
             }
         });
         opacity.addEventListener('input', (e) => {
@@ -389,6 +415,7 @@
         hideBinds.addEventListener('change', (e) => ipcRenderer.send('set-hide-binds', e.target.checked));
         hideJumpCrouch.addEventListener('change', (e) => ipcRenderer.send('set-hide-jump-crouch', e.target.checked));
         arrowsMouse.addEventListener('change', (e) => ipcRenderer.send('set-arrows-mouse', e.target.checked));
+        flipTurnBinds.addEventListener('change', (e) => ipcRenderer.send('set-flip-turn-binds', e.target.checked));
         alwaysOnTop.addEventListener('change', (e) => {
             ipcRenderer.send('set-always-on-top', e.target.checked);
             ipcRenderer.send('set-always-on-top-main', e.target.checked);
@@ -403,6 +430,10 @@
             setPortBtn.innerText = "Saved";
             setPortBtn.style.color = "#4caf50";
             setPortBtn.disabled = true;
+            
+            // Update URL display
+            obsUrlDisplay.innerText = `http://localhost:${serverPort.value}`;
+            
             setTimeout(() => {
                 setPortBtn.innerText = originalText;
                 setPortBtn.style.color = "";
@@ -430,6 +461,7 @@
             hideBinds.checked = config.hideBinds;
             hideJumpCrouch.checked = config.hideJumpCrouch;
             arrowsMouse.checked = config.arrowsForMouse;
+            flipTurnBinds.checked = config.flipTurnBinds || false;
             alwaysOnTop.checked = config.alwaysOnTop || false;
             if (config.windowScale) {
                 windowScale.value = config.windowScale;
@@ -437,22 +469,25 @@
             }
             if (config.port) {
                 serverPort.value = config.port;
+                obsUrlDisplay.innerText = `http://localhost:${config.port}`;
             }
             if (config.theme) {
-                fontFamily.value = config.theme.fontFamily;
-                colors.bgIdle.value = colorToHex(config.theme.bgIdle);
-                colors.borderIdle.value = colorToHex(config.theme.borderIdle);
-                colors.textIdle.value = colorToHex(config.theme.textIdle);
-                colors.bgActive.value = colorToHex(config.theme.bgActive);
-                colors.borderActive.value = colorToHex(config.theme.borderActive);
-                colors.textActive.value = colorToHex(config.theme.textActive);
-                colors.glowActive.value = colorToHex(config.theme.glowActive);
+                applyThemeToUI(config.theme);
+                
+                // If the config theme doesn't match a preset, it's custom.
+                // But we don't want to overwrite custom cache with "glass" default if it's fresh.
+                // Simple heuristic: always update custom cache with incoming config if it's the first load
+                if (Object.keys(customThemeCache).length === 0) {
+                    customThemeCache = { ...config.theme };
+                }
             }
         });
         ipcRenderer.on('binding-recorded', (event, data) => {
             if (currentRebindBtn && currentRebindBtn.dataset.action === data.action) {
                 let display = data.keyName;
                 if(display === 'Space') display = 'SPC';
+                if(data.type === 'mouse') display = 'M' + data.button;
+                
                 currentRebindBtn.innerText = display; 
                 currentRebindBtn.dataset.key = display; 
                 currentRebindBtn.classList.remove('recording');

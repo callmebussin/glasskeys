@@ -1,6 +1,6 @@
 {
   "name": "glasskeys",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Twitch Overlay Keypress Visualizer",
   "main": "main.js",
   "scripts": {
@@ -32,8 +32,10 @@
     },
     "files": [
       "**/*",
-      "!*.zip",
-      "!dist"
+      "!**/*.zip",
+      "!dist",
+      "!glasskeys-win32-x64",
+      "!.git"
     ]
   }
 }

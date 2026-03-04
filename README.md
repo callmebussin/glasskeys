@@ -2,7 +2,7 @@
 
 ![GlassKeys Demo](public/demo.gif)
 
-A minimal, transparent overlay for Twitch streams that displays live keypress inputs for W, A, S, D, TAB, SPACE, and Mouse Buttons.
+A minimal, transparent overlay for Twitch streams and screen recordings that displays live keypress inputs for W, A, S, D, TAB, SPACE, and Mouse Buttons.
 
 ## Download & Installation
 
@@ -32,6 +32,12 @@ This method provides the cleanest transparency.
 3.  Select **[GlassKeys.exe]: GlassKeys Preview**.
 4.  Set "Capture Method" to **Windows 10 (1903 and up)** to support transparency properly.
 5.  Enable "Allow Transparency" if available.
+
+## Local Use / Screen Recording
+
+GlassKeys includes an **Always on Top** feature, allowing you to use the overlay directly on your desktop while recording your screen without OBS. You can enable this in the **Configuration** menu (Right-click tray icon).
+
+**Important Note:** To ensure the overlay remains visible over your game, the game must be running in **Windowed Borderless** or **Windowed** mode. This feature will not work if the game is in exclusive Fullscreen mode.
 
 ## Configuration
 

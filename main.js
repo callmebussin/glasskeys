@@ -48,9 +48,11 @@ function createConfigWindow() {
   }
   configWindow = new BrowserWindow({
     width: 800,
-    height: 700, 
-    minWidth: 600,
-    minHeight: 600,
+    height: 740, 
+    minWidth: 800,
+    minHeight: 740,
+    maxWidth: 800,
+    maxHeight: 740,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false
