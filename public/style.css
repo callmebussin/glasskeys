@@ -9,7 +9,11 @@ body {
     height: fit-content;
 }
 body.desktop-mode {
-    background-color: transparent; 
+    background-color: transparent;
+    -webkit-app-region: drag;
+}
+body.desktop-mode .key {
+    -webkit-app-region: no-drag;
 }
 :root {
     --font-family: 'Inter', sans-serif;
