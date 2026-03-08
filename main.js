@@ -15,7 +15,7 @@ function createMainWindow() {
     width: 765,
     height: 375,
     useContentSize: true,
-    resizable: false,
+    resizable: true,
     backgroundColor: '#00000000',
     transparent: true,
     webPreferences: {
@@ -106,6 +106,36 @@ ipcMain.on('resize-window', (event, { width, height }) => {
 ipcMain.on('set-always-on-top-main', (event, value) => {
     if (mainWindow) {
         mainWindow.setAlwaysOnTop(value, "screen-saver");
+    }
+});
+ipcMain.on('start-drag', (event) => {
+    const win = BrowserWindow.fromWebContents(event.sender);
+    if (win) {
+        win.setMovable(true);
+        const [winX, winY] = win.getPosition();
+        const { screen } = require('electron');
+        const cursorPos = screen.getCursorScreenPoint();
+        const offsetX = cursorPos.x - winX;
+        const offsetY = cursorPos.y - winY;
+        event.sender.send('drag-offset', { offsetX, offsetY });
+    }
+});
+ipcMain.on('drag-move', (event, { x, y }) => {
+    const win = BrowserWindow.fromWebContents(event.sender);
+    if (win) {
+        win.setPosition(x, y);
+    }
+});
+ipcMain.on('get-bounds', (event) => {
+    const win = BrowserWindow.fromWebContents(event.sender);
+    if (win) {
+        event.sender.send('window-bounds', win.getBounds());
+    }
+});
+ipcMain.on('resize-bounds', (event, bounds) => {
+    const win = BrowserWindow.fromWebContents(event.sender);
+    if (win) {
+        win.setBounds(bounds);
     }
 });
 app.whenReady().then(() => {

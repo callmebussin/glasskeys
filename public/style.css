@@ -7,14 +7,49 @@ body {
     overflow: hidden; 
     width: fit-content;
     height: fit-content;
+    user-select: none;
+    -webkit-user-select: none;
 }
 body.desktop-mode {
     background-color: transparent;
-    -webkit-app-region: drag;
+    cursor: grab;
+}
+body.desktop-mode.dragging {
+    cursor: grabbing;
 }
 body.desktop-mode .key {
-    -webkit-app-region: no-drag;
+    cursor: default;
 }
+.resize-handle {
+    display: none;
+    position: fixed;
+    width: 18px;
+    height: 18px;
+    z-index: 1000;
+}
+body.desktop-mode .resize-handle {
+    display: block;
+}
+.resize-handle-tl { top: 0; left: 0; cursor: nw-resize; }
+.resize-handle-tr { top: 0; right: 0; cursor: ne-resize; }
+.resize-handle-bl { bottom: 0; left: 0; cursor: sw-resize; }
+.resize-handle-br { bottom: 0; right: 0; cursor: se-resize; }
+.resize-handle::after {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-style: solid;
+    border-color: rgba(255, 255, 255, 0.4);
+    transition: border-color 0.15s;
+}
+.resize-handle:hover::after {
+    border-color: rgba(255, 255, 255, 0.8);
+}
+.resize-handle-tl::after { top: 3px; left: 3px; border-width: 2px 0 0 2px; }
+.resize-handle-tr::after { top: 3px; right: 3px; border-width: 2px 2px 0 0; }
+.resize-handle-bl::after { bottom: 3px; left: 3px; border-width: 0 0 2px 2px; }
+.resize-handle-br::after { bottom: 3px; right: 3px; border-width: 0 2px 2px 0; }
 :root {
     --font-family: 'Inter', sans-serif;
     --bg-idle: rgba(0, 0, 0, 0.15);

@@ -1,7 +1,91 @@
 const ipcRenderer = (typeof require !== 'undefined') ? require('electron').ipcRenderer : null;
 const urlParams = new URLSearchParams(window.location.search);
-if (urlParams.get('mode') === 'desktop') {
+const isDesktop = urlParams.get('mode') === 'desktop';
+if (isDesktop) {
     document.body.classList.add('desktop-mode');
+}
+if (isDesktop && ipcRenderer) {
+    let isDragging = false;
+    let dragOffsetX = 0;
+    let dragOffsetY = 0;
+    let isResizing = false;
+    let resizeCorner = null;
+    let resizeStartX = 0;
+    let resizeStartY = 0;
+    let resizeStartBounds = null;
+    const resizeHandles = document.querySelectorAll('.resize-handle');
+    resizeHandles.forEach(handle => {
+        handle.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            isResizing = true;
+            resizeCorner = handle.dataset.resize;
+            resizeStartX = e.screenX;
+            resizeStartY = e.screenY;
+            ipcRenderer.send('get-bounds');
+        });
+    });
+    ipcRenderer.on('window-bounds', (event, bounds) => {
+        resizeStartBounds = bounds;
+    });
+    document.addEventListener('mousedown', (e) => {
+        if (isResizing) return;
+        if (e.target.closest('.resize-handle')) return;
+        e.preventDefault();
+        isDragging = true;
+        document.body.classList.add('dragging');
+        ipcRenderer.send('start-drag');
+    });
+    ipcRenderer.on('drag-offset', (event, { offsetX, offsetY }) => {
+        dragOffsetX = offsetX;
+        dragOffsetY = offsetY;
+    });
+    document.addEventListener('mousemove', (e) => {
+        if (isDragging) {
+            ipcRenderer.send('drag-move', {
+                x: e.screenX - dragOffsetX,
+                y: e.screenY - dragOffsetY
+            });
+        }
+        if (isResizing && resizeStartBounds) {
+            const dx = e.screenX - resizeStartX;
+            const dy = e.screenY - resizeStartY;
+            const sb = resizeStartBounds;
+            let newX = sb.x, newY = sb.y, newW = sb.width, newH = sb.height;
+            if (resizeCorner === 'br') {
+                newW = Math.max(200, sb.width + dx);
+                newH = Math.max(150, sb.height + dy);
+            } else if (resizeCorner === 'bl') {
+                newW = Math.max(200, sb.width - dx);
+                newH = Math.max(150, sb.height + dy);
+                newX = sb.x + (sb.width - newW);
+            } else if (resizeCorner === 'tr') {
+                newW = Math.max(200, sb.width + dx);
+                newH = Math.max(150, sb.height - dy);
+                newY = sb.y + (sb.height - newH);
+            } else if (resizeCorner === 'tl') {
+                newW = Math.max(200, sb.width - dx);
+                newH = Math.max(150, sb.height - dy);
+                newX = sb.x + (sb.width - newW);
+                newY = sb.y + (sb.height - newH);
+            }
+            ipcRenderer.send('resize-bounds', {
+                x: Math.round(newX), y: Math.round(newY),
+                width: Math.round(newW), height: Math.round(newH)
+            });
+        }
+    });
+    document.addEventListener('mouseup', () => {
+        if (isDragging) {
+            isDragging = false;
+            document.body.classList.remove('dragging');
+        }
+        if (isResizing) {
+            isResizing = false;
+            resizeCorner = null;
+            resizeStartBounds = null;
+        }
+    });
 }
 const socket = new WebSocket('ws://localhost:8081');
 const ui = {
