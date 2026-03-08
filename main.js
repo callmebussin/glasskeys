@@ -1,6 +1,6 @@
 const { app, BrowserWindow, Tray, Menu, nativeImage, ipcMain } = require('electron');
 const path = require('path');
-require('./index.js');
+const { initIpc } = require('./index.js');
 let mainWindow;
 let configWindow;
 let tray = null;
@@ -22,7 +22,7 @@ function createMainWindow() {
       nodeIntegration: true,
       contextIsolation: false
     },
-    frame: true,
+    frame: false,
     title: "GlassKeys Preview",
     autoHideMenuBar: true,
     icon: path.join(__dirname, 'public', 'icon.png'),
@@ -109,6 +109,7 @@ ipcMain.on('set-always-on-top-main', (event, value) => {
     }
 });
 app.whenReady().then(() => {
+  initIpc();
   createMainWindow();
   createConfigWindow();
   createTray();

@@ -9,7 +9,7 @@ body {
     height: fit-content;
 }
 body.desktop-mode {
-    background-color: #1e1e1e; 
+    background-color: transparent; 
 }
 :root {
     --font-family: 'Inter', sans-serif;

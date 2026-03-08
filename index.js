@@ -3,7 +3,6 @@ const WebSocket = require('ws');
 const fs = require('fs');
 const http = require('http');
 const path = require('path');
-const { ipcMain, BrowserWindow } = require('electron');
 const WS_PORT = 8081;
 const keyState = {
     W: false,
@@ -89,6 +88,7 @@ uIOhook.on('keydown', (e) => {
         }
         keyMap[e.keycode] = recordingAction;
         let keyName = ReverseKeyMap[e.keycode] || e.keycode;
+        const { BrowserWindow } = require('electron');
         BrowserWindow.getAllWindows().forEach(win => {
             win.webContents.send('binding-recorded', { action: recordingAction, keycode: e.keycode, keyName: keyName, type: 'keyboard' });
         });
@@ -123,6 +123,7 @@ uIOhook.on('mousedown', (e) => {
             }
         }
         mouseMap[e.button] = recordingAction;
+        const { BrowserWindow } = require('electron');
         BrowserWindow.getAllWindows().forEach(win => {
             win.webContents.send('binding-recorded', { action: recordingAction, button: e.button, keyName: 'Mouse ' + e.button, type: 'mouse' });
         });
@@ -145,52 +146,6 @@ uIOhook.on('mouseup', (e) => {
     }
 });
 uIOhook.start();
-ipcMain.on('set-opacity', (event, opacity) => {
-    appConfig.opacity = opacity;
-    broadcastConfig();
-});
-ipcMain.on('set-hide-binds', (event, value) => {
-    appConfig.hideBinds = value;
-    checkCompactMode();
-    broadcastConfig();
-});
-ipcMain.on('set-hide-jump-crouch', (event, value) => {
-    appConfig.hideJumpCrouch = value;
-    checkCompactMode();
-    broadcastConfig();
-});
-ipcMain.on('set-arrows-mouse', (event, value) => {
-    appConfig.arrowsForMouse = value;
-    broadcastConfig();
-});
-ipcMain.on('set-theme', (event, theme) => {
-    appConfig.theme = { ...appConfig.theme, ...theme };
-    broadcastConfig();
-});
-ipcMain.on('set-always-on-top', (event, value) => {
-    appConfig.alwaysOnTop = value;
-    broadcastConfig();
-});
-ipcMain.on('set-flip-turn-binds', (event, value) => {
-    appConfig.flipTurnBinds = value;
-    broadcastConfig();
-});
-ipcMain.on('set-window-scale', (event, value) => {
-    appConfig.windowScale = parseFloat(value);
-    broadcastConfig();
-});
-ipcMain.on('set-port', (event, value) => {
-    const newPort = parseInt(value);
-    if (newPort !== appConfig.port) {
-        appConfig.port = newPort;
-        server.close(() => {
-            server.listen(appConfig.port, () => {
-                console.log(`Server restarted on port ${appConfig.port}`);
-            });
-        });
-        broadcastConfig();
-    }
-});
 function checkCompactMode() {
     if (appConfig.hideBinds && !appConfig.hideJumpCrouch) {
         appConfig.compactMode = true;
@@ -198,13 +153,62 @@ function checkCompactMode() {
         appConfig.compactMode = false;
     }
 }
-ipcMain.on('start-recording', (event, action) => {
-    isRecording = true;
-    recordingAction = action;
-});
-ipcMain.on('get-current-config', (event) => {
-    event.reply('current-config', appConfig);
-});
+function initIpc() {
+    const { ipcMain } = require('electron');
+    ipcMain.on('set-opacity', (event, opacity) => {
+        appConfig.opacity = opacity;
+        broadcastConfig();
+    });
+    ipcMain.on('set-hide-binds', (event, value) => {
+        appConfig.hideBinds = value;
+        checkCompactMode();
+        broadcastConfig();
+    });
+    ipcMain.on('set-hide-jump-crouch', (event, value) => {
+        appConfig.hideJumpCrouch = value;
+        checkCompactMode();
+        broadcastConfig();
+    });
+    ipcMain.on('set-arrows-mouse', (event, value) => {
+        appConfig.arrowsForMouse = value;
+        broadcastConfig();
+    });
+    ipcMain.on('set-theme', (event, theme) => {
+        appConfig.theme = { ...appConfig.theme, ...theme };
+        broadcastConfig();
+    });
+    ipcMain.on('set-always-on-top', (event, value) => {
+        appConfig.alwaysOnTop = value;
+        broadcastConfig();
+    });
+    ipcMain.on('set-flip-turn-binds', (event, value) => {
+        appConfig.flipTurnBinds = value;
+        broadcastConfig();
+    });
+    ipcMain.on('set-window-scale', (event, value) => {
+        appConfig.windowScale = parseFloat(value);
+        broadcastConfig();
+    });
+    ipcMain.on('set-port', (event, value) => {
+        const newPort = parseInt(value);
+        if (newPort !== appConfig.port) {
+            appConfig.port = newPort;
+            server.close(() => {
+                server.listen(appConfig.port, () => {
+                    console.log(`Server restarted on port ${appConfig.port}`);
+                });
+            });
+            broadcastConfig();
+        }
+    });
+    ipcMain.on('start-recording', (event, action) => {
+        isRecording = true;
+        recordingAction = action;
+    });
+    ipcMain.on('get-current-config', (event) => {
+        event.reply('current-config', appConfig);
+    });
+}
 const server = http.createServer((req, res) => {
     const url = new URL(req.url, `http://${req.headers.host}`);
     const pathname = url.pathname === '/' ? 'index.html' : url.pathname;
@@ -236,4 +240,4 @@ const server = http.createServer((req, res) => {
 });
 server.listen(appConfig.port, () => {
 });
-module.exports = { appConfig };
+module.exports = { appConfig, initIpc };
