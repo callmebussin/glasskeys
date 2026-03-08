@@ -13,6 +13,11 @@ body {
 body.desktop-mode {
     background-color: transparent;
     cursor: grab;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 body.desktop-mode.dragging {
     cursor: grabbing;
@@ -20,11 +25,14 @@ body.desktop-mode.dragging {
 body.desktop-mode .key {
     cursor: default;
 }
+body.desktop-mode .overlay-container {
+    transform-origin: center center;
+}
 .resize-handle {
     display: none;
     position: fixed;
-    width: 18px;
-    height: 18px;
+    width: 32px;
+    height: 32px;
     z-index: 1000;
 }
 body.desktop-mode .resize-handle {
@@ -37,19 +45,21 @@ body.desktop-mode .resize-handle {
 .resize-handle::after {
     content: '';
     position: absolute;
-    width: 10px;
-    height: 10px;
+    width: 16px;
+    height: 16px;
     border-style: solid;
-    border-color: rgba(255, 255, 255, 0.4);
-    transition: border-color 0.15s;
+    border-color: rgba(255, 255, 255, 0.35);
+    border-radius: 4px;
+    transition: border-color 0.15s, box-shadow 0.15s;
 }
 .resize-handle:hover::after {
-    border-color: rgba(255, 255, 255, 0.8);
+    border-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
 }
-.resize-handle-tl::after { top: 3px; left: 3px; border-width: 2px 0 0 2px; }
-.resize-handle-tr::after { top: 3px; right: 3px; border-width: 2px 2px 0 0; }
-.resize-handle-bl::after { bottom: 3px; left: 3px; border-width: 0 0 2px 2px; }
-.resize-handle-br::after { bottom: 3px; right: 3px; border-width: 0 2px 2px 0; }
+.resize-handle-tl::after { top: 4px; left: 4px; border-width: 3px 0 0 3px; border-radius: 6px 0 0 0; }
+.resize-handle-tr::after { top: 4px; right: 4px; border-width: 3px 3px 0 0; border-radius: 0 6px 0 0; }
+.resize-handle-bl::after { bottom: 4px; left: 4px; border-width: 0 0 3px 3px; border-radius: 0 0 0 6px; }
+.resize-handle-br::after { bottom: 4px; right: 4px; border-width: 0 3px 3px 0; border-radius: 0 0 6px 0; }
 :root {
     --font-family: 'Inter', sans-serif;
     --bg-idle: rgba(0, 0, 0, 0.15);

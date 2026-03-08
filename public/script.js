@@ -4,6 +4,16 @@ const isDesktop = urlParams.get('mode') === 'desktop';
 if (isDesktop) {
     document.body.classList.add('desktop-mode');
 }
+let baseWidth = 765;
+let baseHeight = 375;
+const overlayContainer = document.querySelector('.overlay-container');
+function updateContentScale() {
+    if (!isDesktop || !overlayContainer) return;
+    const scaleX = window.innerWidth / baseWidth;
+    const scaleY = window.innerHeight / baseHeight;
+    const scale = Math.min(scaleX, scaleY);
+    overlayContainer.style.transform = 'scale(' + scale + ')';
+}
 if (isDesktop && ipcRenderer) {
     let isDragging = false;
     let dragOffsetX = 0;
@@ -13,6 +23,7 @@ if (isDesktop && ipcRenderer) {
     let resizeStartX = 0;
     let resizeStartY = 0;
     let resizeStartBounds = null;
+    window.addEventListener('resize', updateContentScale);
     const resizeHandles = document.querySelectorAll('.resize-handle');
     resizeHandles.forEach(handle => {
         handle.addEventListener('mousedown', (e) => {
@@ -190,12 +201,19 @@ function applyConfig(config) {
             if (config.hideJumpCrouch && !config.hideBinds) width = 570;
             if (config.hideBinds && config.hideJumpCrouch) width = 570;
         }
-        const scale = config.windowScale || 1.0;
-        document.body.style.zoom = scale;
-        ipcRenderer.send('resize-window', { 
-            width: Math.ceil(width * scale), 
-            height: Math.ceil(height * scale) 
-        });
+        if (isDesktop) {
+            baseWidth = width;
+            baseHeight = height;
+            document.body.style.zoom = '';
+            updateContentScale();
+        } else {
+            const scale = config.windowScale || 1.0;
+            document.body.style.zoom = scale;
+            ipcRenderer.send('resize-window', { 
+                width: Math.ceil(width * scale), 
+                height: Math.ceil(height * scale) 
+            });
+        }
     }
 }
 function updateOverlay(state) {
